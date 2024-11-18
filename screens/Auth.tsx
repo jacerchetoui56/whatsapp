@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   View,
+  ToastAndroid,
 } from "react-native";
 import firebase from "../config";
 
@@ -17,8 +18,13 @@ export default function Auth(props: any) {
   function handleSubmit() {
     auth
       .signInWithEmailAndPassword(email, password)
-      .then(() => props.navigation.replace("Home"))
-      .catch((e) => console.log("error: ", e.message));
+      .then(() => {
+        ToastAndroid.show("Logged in", ToastAndroid.SHORT);
+        props.navigation.replace("Home");
+      })
+      .catch((e) => {
+        ToastAndroid.show(e.message, ToastAndroid.SHORT);
+      });
   }
 
   return (
