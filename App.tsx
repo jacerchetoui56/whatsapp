@@ -4,6 +4,7 @@ import Auth from "./screens/Auth";
 import Home from "./screens/Home";
 import NewUser from "./screens/NewUser";
 import MyProfile from "./screens/home/MyProfile";
+import Chat from "./screens/Chat";
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,11 @@ export default function App() {
         <Stack.Screen
           name="Profile"
           component={MyProfile}
+          options={{ headerShown: true }}
+        />
+        <Stack.Screen
+          name="Chat"
+          component={Chat}
           options={{ headerShown: true }}
         />
       </Stack.Navigator>
