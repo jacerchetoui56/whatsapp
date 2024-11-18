@@ -21,8 +21,6 @@ export default function MyProfile(props: any) {
 
   const profile = auth.currentUser;
 
-  console.log("profile : ", profile);
-
   useEffect(() => {
     if (profile) {
       if (profile.displayName) {
@@ -128,6 +126,33 @@ export default function MyProfile(props: any) {
           }}
         >
           Save
+        </Text>
+      </TouchableHighlight>
+      <TouchableHighlight
+        activeOpacity={0.5}
+        underlayColor="#DDDDDD"
+        onPress={() => props.navigation.replace("Home")}
+        style={{
+          marginBottom: 10,
+          borderColor: "#00f",
+          borderWidth: 2,
+          backgroundColor: "#08f6",
+          fontSize: 24,
+          height: 60,
+          width: "50%",
+          justifyContent: "center",
+          alignItems: "center",
+          borderRadius: 5,
+          marginTop: 20,
+        }}
+      >
+        <Text
+          style={{
+            color: "#FFF",
+            fontSize: 24,
+          }}
+        >
+          Back
         </Text>
       </TouchableHighlight>
     </ImageBackground>
