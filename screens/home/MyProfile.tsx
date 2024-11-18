@@ -12,6 +12,7 @@ import {
 import firebase from "../../config";
 
 const auth = firebase.auth();
+const db = firebase.database();
 
 export default function MyProfile(props: any) {
   const [nom, setNom] = useState("");
@@ -24,23 +25,32 @@ export default function MyProfile(props: any) {
 
   useEffect(() => {
     if (profile) {
-      const displayName = profile.displayName || "";
-      const [_prenom, _nom] = displayName.split(" ");
-      console.log("updating: ", _prenom, _nom, profile.phoneNumber);
-      setNom(_nom);
-      setPrenom(_prenom);
-      setTelephone(profile.phoneNumber || "");
+      if (profile.displayName) {
+        const displayName = profile.displayName || "";
+        const [_prenom, _nom] = displayName.split(" ");
+        console.log("updating: ", _prenom, _nom, profile.phoneNumber);
+        setNom(_nom);
+        setPrenom(_prenom);
+      }
+      if (profile.phoneNumber) {
+        setTelephone(profile.phoneNumber || "");
+      }
     }
   }, []);
 
   function handleUpdateData() {
-    auth
-      .updateCurrentUser({
-        ...profile,
-        displayName: prenom + " " + nom,
-        phoneNumber: telephone,
+    const ref_listprofiles = db.ref("list_profiles/");
+
+    ref_listprofiles
+      .push({
+        nom: nom,
+        prenom: prenom,
+        telephone: telephone,
       })
-      .then(() => props.navigation.replace("Home"))
+      .then(() => {
+        ToastAndroid.show("Updated", ToastAndroid.SHORT);
+        // props.navigation.replace("Home");
+      })
       .catch(() => ToastAndroid.show("Error Updating", ToastAndroid.SHORT));
   }
 
