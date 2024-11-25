@@ -10,14 +10,34 @@ import {
   TouchableHighlight,
 } from "react-native";
 import firebase from "../../config";
+import * as ImagePicker from 'expo-image-picker';
 
 const auth = firebase.auth();
 const db = firebase.database();
+const [image, setImage] = useState<string | null>(null);
+const [isDefaultImage, setisDefaultImage] = useState(true);
+const [uriLocalImage, seturiLocalImage] = useState("");
+
 
 export default function MyProfile(props: any) {
   const [nom, setNom] = useState("");
   const [prenom, setPrenom] = useState("");
   const [telephone, setTelephone] = useState("");
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images', 'videos'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    console.log(result);
+  
+    if (!result.canceled) {
+      seturiLocalImage(result.assets[0].uri);
+    }
+  };
 
   const profile = auth.currentUser;
 
@@ -52,6 +72,8 @@ export default function MyProfile(props: any) {
       .catch(() => ToastAndroid.show("Error Updating", ToastAndroid.SHORT));
   }
 
+ 
+
   return (
     <ImageBackground
       source={require("../../assets/me.jpg")}
@@ -60,14 +82,22 @@ export default function MyProfile(props: any) {
       <StatusBar style="light" />
       <Text style={styles.textstyle}>My Account</Text>
 
+      <TouchableHighlight
+      onPress={()=>{
+        pickImage();
+      }}>
       <Image
-        source={require("../../assets/icon.png")}
+        source={isDefaultImage?require("../../assets/icon.png"):{uri:uriLocalImage}}
         style={{
           height: 200,
           width: 200,
           borderRadius: 100,
         }}
       />
+
+      </TouchableHighlight>
+
+    
 
       <TextInput
         onChangeText={(text) => {
@@ -110,7 +140,6 @@ export default function MyProfile(props: any) {
           borderColor: "#00f",
           borderWidth: 2,
           backgroundColor: "#08f6",
-          fontSize: 24,
           height: 60,
           width: "50%",
           justifyContent: "center",
@@ -137,7 +166,6 @@ export default function MyProfile(props: any) {
           borderColor: "#00f",
           borderWidth: 2,
           backgroundColor: "#08f6",
-          fontSize: 24,
           height: 60,
           width: "50%",
           justifyContent: "center",
