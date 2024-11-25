@@ -49,7 +49,7 @@ export default function Home(props: any) {
       </Pressable>
       <Pressable
         style={[styles.button, { backgroundColor: "orange" }]}
-        onPress={() => props.navigation.replace("Chat")}
+        onPress={() => props.navigation.navigate("Chat")}
       >
         <Text style={{ color: "white" }}>Chat</Text>
       </Pressable>
