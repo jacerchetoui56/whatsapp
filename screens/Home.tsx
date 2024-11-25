@@ -52,9 +52,15 @@ export default function Home(props: any) {
         data={data}
         renderItem={({ item }) => (
           <View style={styles.profile}>
-            <Text>{item.nom}</Text>
-            <Text>{item.prenom}</Text>
-            <Text>{item.telephone}</Text>
+            <Pressable
+              onPress={() =>
+                props.navigation.navigate("Chat", { profile: item })
+              }
+            >
+              <Text>{item.nom}</Text>
+              <Text>{item.prenom}</Text>
+              <Text>{item.telephone}</Text>
+            </Pressable>
           </View>
         )}
         keyExtractor={(item) => item.telephone}
