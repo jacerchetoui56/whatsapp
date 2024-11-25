@@ -3,37 +3,90 @@ import React, { useEffect, useState } from "react";
 import {
   Image,
   ImageBackground,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
   ToastAndroid,
   TouchableHighlight,
 } from "react-native";
-import firebase from "../../config";
-import * as ImagePicker from 'expo-image-picker';
+import { firebase, supabase } from "../../config";
+import * as ImagePicker from "expo-image-picker";
 
 const auth = firebase.auth();
 const db = firebase.database();
-const [image, setImage] = useState<string | null>(null);
-const [isDefaultImage, setisDefaultImage] = useState(true);
-const [uriLocalImage, seturiLocalImage] = useState("");
-
 
 export default function MyProfile(props: any) {
+  // const currentId = props.route?.params("currentId");
+
   const [nom, setNom] = useState("");
   const [prenom, setPrenom] = useState("");
   const [telephone, setTelephone] = useState("");
 
+  const [image, setImage] = useState<string | null>(null);
+  const [isDefaultImage, setisDefaultImage] = useState(true);
+  const [uriLocalImage, seturiLocalImage] = useState("");
+
+  // const uploadImage = async (uri: string) => {
+  //   const response = await fetch(uri);
+  //   const blob = await response.blob();
+
+  //   const r = supabase.storage.from("avatars").upload("avatar.png", blob);
+  //   ToastAndroid.show("Image Uploaded", ToastAndroid.SHORT);
+  // };
+
   const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      ToastAndroid.show("Media library permissions denied", ToastAndroid.SHORT);
+      return;
+    }
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images', 'videos'],
+      mediaTypes: ["images", "videos"],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
     console.log(result);
-  
+
+    try {
+      const selectedUri = result.assets[0].uri;
+
+      // Validate URI
+      if (!selectedUri) {
+        throw new Error("Invalid image URI");
+      }
+      // Use platform-specific file prefix for web/file URIs
+      const fileUri =
+        Platform.OS === "android"
+          ? selectedUri
+          : selectedUri.replace("file://", "");
+
+      const response = await fetch(fileUri);
+      if (!response.ok) {
+        throw "error when fetching image uri";
+      }
+      const blob = await response.blob();
+      console.log("blob is : ", blob);
+      const fileName = `public/${Date.now()}_avatar.jpg`; // Unique filename
+
+      const uploadedFile = await supabase.storage
+        .from("whatsapp_bucket")
+        .upload(fileName, blob, {
+          contentType: blob.type || "image/jpeg",
+        });
+
+      if (uploadedFile.error) {
+        throw uploadedFile.error;
+      }
+
+      ToastAndroid.show("Image Uploaded", ToastAndroid.SHORT);
+    } catch (e) {
+      console.log("error: ", e);
+      ToastAndroid.show("Error Uploading Image", ToastAndroid.SHORT);
+    }
+
     if (!result.canceled) {
       seturiLocalImage(result.assets[0].uri);
     }
@@ -72,8 +125,6 @@ export default function MyProfile(props: any) {
       .catch(() => ToastAndroid.show("Error Updating", ToastAndroid.SHORT));
   }
 
- 
-
   return (
     <ImageBackground
       source={require("../../assets/me.jpg")}
@@ -83,21 +134,23 @@ export default function MyProfile(props: any) {
       <Text style={styles.textstyle}>My Account</Text>
 
       <TouchableHighlight
-      onPress={()=>{
-        pickImage();
-      }}>
-      <Image
-        source={isDefaultImage?require("../../assets/icon.png"):{uri:uriLocalImage}}
-        style={{
-          height: 200,
-          width: 200,
-          borderRadius: 100,
+        onPress={() => {
+          pickImage();
         }}
-      />
-
+      >
+        <Image
+          source={
+            isDefaultImage
+              ? require("../../assets/icon.png")
+              : { uri: uriLocalImage }
+          }
+          style={{
+            height: 200,
+            width: 200,
+            borderRadius: 100,
+          }}
+        />
       </TouchableHighlight>
-
-    
 
       <TextInput
         onChangeText={(text) => {

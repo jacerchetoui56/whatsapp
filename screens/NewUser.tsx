@@ -7,7 +7,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import firebase from "../config";
+import { firebase } from "../config";
 
 const auth = firebase.auth();
 
@@ -17,7 +17,12 @@ export default function NewUser(props: any) {
   function handleSubmit() {
     auth
       .createUserWithEmailAndPassword(email, password)
-      .then(() => props.navigation.replace("Home"))
+      .then(() => {
+        const currentId = auth.currentUser?.uid;
+        props.navigation.replace("Home", {
+          currentId,
+        });
+      })
       .catch((e) => console.log("error: ", e.message));
   }
 

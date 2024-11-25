@@ -5,6 +5,7 @@ import Home from "./screens/Home";
 import NewUser from "./screens/NewUser";
 import MyProfile from "./screens/home/MyProfile";
 import Chat from "./screens/Chat";
+import { firebase } from "./config";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +32,9 @@ export default function App() {
           name="Profile"
           component={MyProfile}
           options={{ headerShown: true }}
+          initialParams={{
+            currentId: firebase.auth().currentUser?.uid,
+          }}
         />
         <Stack.Screen
           name="Chat"

@@ -1,7 +1,7 @@
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import firebase from "../config";
+import { firebase } from "../config";
 
 type Profile = {
   nom: string;
@@ -46,6 +46,12 @@ export default function Home(props: any) {
         onPress={() => props.navigation.replace("Profile")}
       >
         <Text style={{ color: "white" }}>Profile</Text>
+      </Pressable>
+      <Pressable
+        style={[styles.button, { backgroundColor: "orange" }]}
+        onPress={() => props.navigation.replace("Chat")}
+      >
+        <Text style={{ color: "white" }}>Chat</Text>
       </Pressable>
       {/* make a flatlist of the profiles */}
       <FlatList

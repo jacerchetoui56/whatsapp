@@ -8,7 +8,7 @@ import {
   View,
   ToastAndroid,
 } from "react-native";
-import firebase from "../config";
+import { firebase } from "../config";
 
 const auth = firebase.auth();
 
@@ -20,7 +20,10 @@ export default function Auth(props: any) {
       .signInWithEmailAndPassword(email, password)
       .then(() => {
         ToastAndroid.show("Logged in", ToastAndroid.SHORT);
-        props.navigation.replace("Home");
+        const currentId = auth.currentUser?.uid;
+        props.navigation.replace("Home", {
+          currentId,
+        });
       })
       .catch((e) => {
         ToastAndroid.show(e.message, ToastAndroid.SHORT);
